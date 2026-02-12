@@ -1,70 +1,112 @@
-"use client";
-import { useRouter } from "next/navigation";
-import { setUser, validateCredentials, findUserByEmail } from "@/lib/auth";
-import { useState } from "react";
+"use client"
+
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import Link from "next/link"
+
+import { loginUser, setUser } from "@/lib/auth"
+
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
 
 export default function LoginPage() {
-  const router = useRouter();
+  const router = useRouter()
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
   const handleLogin = () => {
-    setError(null);
-    const user = validateCredentials(email, password);
-    if (user) {
-      setUser({ name: user.name, email: user.email });
-      router.push("/dashboard");
-      return;
+    setError(null)
+
+    if (!email || !password) {
+      setError("Please enter email and password.")
+      return
     }
 
-    const existing = findUserByEmail(email);
-    if (existing) {
-      setError("Incorrect password. Try again.");
-      return;
+    setLoading(true)
+
+    const user = loginUser(email, password)
+
+    if (!user) {
+      setError("Invalid email or password.")
+      setLoading(false)
+      return
     }
 
-    // No account found -> redirect to register with prefilled email
-    router.push(`/register?email=${encodeURIComponent(email)}`);
-  };
+    setUser(user)
+    router.push("/dashboard")
+  }
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gradient-to-br from-blue-100 to-white">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-96">
-        <h2 className="text-2xl font-bold mb-6 text-center">
-          Welcome Back!
-        </h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 p-4">
+      <Card className="w-full max-w-md shadow-xl border border-slate-200">
+        <CardHeader>
+          <CardTitle className="text-2xl font-semibold">
+            Welcome Back
+          </CardTitle>
+          <CardDescription>
+            Enter your credentials to access your dashboard.
+          </CardDescription>
+        </CardHeader>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full mb-4 p-2 border rounded-lg"
-        />
+        <CardContent className="space-y-5">
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full mb-4 p-2 border rounded-lg"
-        />
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="example@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
 
-        {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
 
-        <button
-          onClick={handleLogin}
-          className="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700"
-        >
-          Login
-        </button>
+          {error && (
+            <p className="text-sm text-red-500">{error}</p>
+          )}
 
-        <div className="text-center text-sm text-gray-600 mt-3">
-          No account? <a href="/register" className="text-blue-600">Sign up</a>
-        </div>
-      </div>
+          <Button
+            className="w-full"
+            onClick={handleLogin}
+            disabled={loading}
+          >
+            {loading ? "Signing in..." : "Login"}
+          </Button>
+
+          <Separator />
+
+          <p className="text-sm text-center text-muted-foreground">
+            Don’t have an account?{" "}
+            <Link href="/register" className="underline underline-offset-4 hover:text-foreground">
+              Register
+            </Link>
+          </p>
+
+        </CardContent>
+      </Card>
     </div>
-  );
+  )
 }

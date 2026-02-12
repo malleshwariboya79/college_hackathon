@@ -1,81 +1,126 @@
-"use client";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
-import { registerUser, setUser, findUserByEmail } from "@/lib/auth";
+"use client"
+
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import Link from "next/link"
+
+import { registerUser, setUser, findUserByEmail } from "@/lib/auth"
+
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card"
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const params = useSearchParams();
-  const preEmail = params?.get("email") || "";
+  const router = useRouter()
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState(preEmail);
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-
-  // email is initialized from the `preEmail` search param
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
   const handleSignup = () => {
-    setError(null);
-    if (!email || !password || !name) {
-      setError("Please fill all fields.");
-      return;
+    setError(null)
+
+    if (!name || !email || !password) {
+      setError("All fields are required.")
+      return
     }
 
-    const exists = findUserByEmail(email);
+    const exists = findUserByEmail(email)
     if (exists) {
-      setError("An account with this email already exists. Please log in.");
-      return;
+      setError("An account with this email already exists.")
+      return
     }
 
-    const ok = registerUser(name, email, password);
+    setLoading(true)
+
+    const ok = registerUser(name, email, password)
+
     if (!ok) {
-      setError("Unable to create account. Try a different email.");
-      return;
+      setError("Unable to create account.")
+      setLoading(false)
+      return
     }
 
-    // Auto-login after signup
-    setUser({ name, email });
-    router.push("/dashboard");
-  };
+    setUser({ name, email })
+    router.push("/dashboard")
+  }
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gradient-to-br from-blue-100 to-white">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-96">
-        <h2 className="text-2xl font-bold mb-6 text-center">Create Account</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 p-4">
+      <Card className="w-full max-w-md shadow-xl border border-slate-200">
+        <CardHeader>
+          <CardTitle className="text-2xl font-semibold">
+            Create Account
+          </CardTitle>
+          <CardDescription>
+            Start organizing your academic journey today.
+          </CardDescription>
+        </CardHeader>
 
-        <input
-          type="text"
-          placeholder="Full Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full mb-4 p-2 border rounded-lg"
-        />
+        <CardContent className="space-y-5">
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full mb-4 p-2 border rounded-lg"
-        />
+          <div className="space-y-2">
+            <Label htmlFor="name">Full Name</Label>
+            <Input
+              id="name"
+              placeholder="John Doe"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full mb-4 p-2 border rounded-lg"
-        />
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="example@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
 
-        {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
 
-        <button onClick={handleSignup} className="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700">Sign Up</button>
+          {error && (
+            <p className="text-sm text-red-500">{error}</p>
+          )}
 
-        <div className="text-center text-sm text-gray-600 mt-3">
-          Already have an account? <a href="/login" className="text-blue-600">Login</a>
-        </div>
-      </div>
+          <Button
+            className="w-full"
+            onClick={handleSignup}
+            disabled={loading}
+          >
+            {loading ? "Creating account..." : "Sign Up"}
+          </Button>
+
+          <p className="text-sm text-center text-muted-foreground">
+            Already have an account?{" "}
+            <Link href="/login" className="underline underline-offset-4 hover:text-foreground">
+              Login
+            </Link>
+          </p>
+
+        </CardContent>
+      </Card>
     </div>
-  );
+  )
 }
