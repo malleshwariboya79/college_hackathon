@@ -3,6 +3,9 @@ import "./globals.css";
 export const metadata = {
   title: "Academic Planner",
   description: "Student Productivity Dashboard",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
