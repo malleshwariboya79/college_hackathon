@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #f4f6f9;
+}
+
+:root {
+  --bg: #eef2f6;
+  --sidebar-bg: #172033; /* deep navy */
+  --sidebar-text: #e6f0fb;
+  --card: #ffffff;
+  --muted: #6b7280;
+  --accent: #2563eb; /* primary blue */
+  --accent-2: #3b82f6;
+  --success: #10b981;
+  --glass: rgba(255,255,255,0.6);
+}
+
+/* App utility classes */
+.app-bg { background-color: var(--bg); }
+.app-sidebar { background-color: var(--sidebar-bg); color: var(--sidebar-text); }
+.app-card { background-color: var(--card); }
+.app-accent { color: var(--accent); }
+.app-btn { background-color: var(--accent); color: white; }
+.muted { color: var(--muted); }
+
+/* Card baseline styling */
+.card {
+  background: var(--card);
+  border-radius: 0.75rem;
+  box-shadow: 0 6px 18px rgba(20, 25, 30, 0.06);
+}
+
+/* Sidebar link hover */
+.app-sidebar a:hover, .app-sidebar .hover\:bg-slate-700:hover { background-color: rgba(255,255,255,0.03); }
+
+/* Smooth transitions and common UI helpers */
+.smooth-transition { transition: all 180ms cubic-bezier(.2,.9,.3,1); }
+.fade-in { animation: fadeIn 240ms ease both; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to { opacity:1; transform: translateY(0);} }
+
+/* Buttons */
+.btn {
+  background: var(--accent);
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 6px 14px rgba(37,99,235,0.08);
+}
+.btn:hover { transform: translateY(-1px); }
+
+/* Sidebar link helper to make hover/active smooth */
+.sidebar-link { display: block; padding: 0.75rem 0.8rem; border-radius: 0.6rem; transition: background 160ms, color 160ms; }
+.sidebar-link.active { background: rgba(255,255,255,0.06); color: var(--sidebar-text); }
+
+/* subtle scrollbar for main area */
+main::-webkit-scrollbar { width: 10px; }
+main::-webkit-scrollbar-track { background: transparent; }
+main::-webkit-scrollbar-thumb { background: rgba(20,25,30,0.08); border-radius: 999px; }
+
+/* Floating profile styles */
+/* floating-profile removed; Navbar contains the profile button now */
